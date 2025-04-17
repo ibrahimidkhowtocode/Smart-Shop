@@ -9,7 +9,7 @@ namespace Smart_Shop
     public partial class AdminForm : Form
     {
         private readonly SQLiteDatabase db;
-        private TabControl mainTabControl;
+        private TabControl? mainTabControl;
 
         public AdminForm()
         {
@@ -38,7 +38,7 @@ namespace Smart_Shop
         private void AddTab(string name, Action<TabPage> initializer)
         {
             var tab = new TabPage(name);
-            mainTabControl.TabPages.Add(tab);
+            mainTabControl!.TabPages.Add(tab);
             initializer(tab);
         }
 
@@ -185,4 +185,13 @@ namespace Smart_Shop
 
         private void LoadData()
         {
-            foreach (TabPage tab in mainTabControl.TabPages
+            foreach (TabPage tab in mainTabControl!.TabPages)
+            {
+                if (tab.Controls.Count > 0 && tab.Controls[0] is DataGridView dgv)
+                {
+                    dgv.DataSource = db.GetDataTable($"SELECT * FROM {tab.Text.ToLower()}");
+                }
+            }
+        }
+    }
+}

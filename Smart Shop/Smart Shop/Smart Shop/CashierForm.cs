@@ -12,14 +12,6 @@ namespace Smart_Shop
         private readonly string cashierUsername;
         private readonly List<CartItem> cart = new();
 
-        public sealed class CartItem
-        {
-            public int ProductId { get; set; }
-            public string Name { get; set; } = string.Empty;
-            public decimal Price { get; set; }
-            public int Quantity { get; set; }
-        }
-
         public CashierForm(string username)
         {
             InitializeComponent();
@@ -31,37 +23,37 @@ namespace Smart_Shop
 
         private void ShowNotesPopup()
         {
-            using var form = new Form
+            using (var form = new Form())
             {
-                Text = "Shift Notes",
-                Size = new Size(400, 300)
-            };
+                form.Text = "Shift Notes";
+                form.Size = new Size(400, 300);
 
-            var txtNotes = new TextBox { Multiline = true, Dock = DockStyle.Fill };
-            var btnSave = new Button { Text = "Submit Notes", Dock = DockStyle.Bottom };
+                var txtNotes = new TextBox { Multiline = true, Dock = DockStyle.Fill };
+                var btnSave = new Button { Text = "Submit Notes", Dock = DockStyle.Bottom };
 
-            btnSave.Click += (s, e) =>
-            {
-                db.LogHistory("Cashier Note", txtNotes.Text, cashierUsername);
-                form.Close();
-            };
+                btnSave.Click += (s, e) =>
+                {
+                    db.LogHistory("Cashier Note", txtNotes.Text, cashierUsername);
+                    form.Close();
+                };
 
-            form.Controls.Add(txtNotes);
-            form.Controls.Add(btnSave);
-            form.ShowDialog();
+                form.Controls.Add(txtNotes);
+                form.Controls.Add(btnSave);
+                form.ShowDialog();
+            }
         }
 
         private void InitializeUI()
         {
-            Text = $"Cashier: {cashierUsername}";
-            Size = new Size(800, 600);
+            this.Text = $"Cashier: {cashierUsername}";
+            this.Size = new Size(800, 600);
 
             var splitContainer = new SplitContainer
             {
                 Dock = DockStyle.Fill,
                 Orientation = Orientation.Vertical
             };
-            Controls.Add(splitContainer);
+            this.Controls.Add(splitContainer);
 
             // Products Panel
             var dgvProducts = new DataGridView
@@ -95,14 +87,20 @@ namespace Smart_Shop
             pnlCart.Controls.Add(btnCheckout);
         }
 
-        private void BtnAddToCart_Click(object? sender, EventArgs e)
+        private void BtnAddToCart_Click(object sender, EventArgs e)
         {
             // Implementation for adding to cart
         }
 
-        private void BtnCheckout_Click(object? sender, EventArgs e)
+        private void BtnCheckout_Click(object sender, EventArgs e)
         {
             // Implementation for checkout
         }
     }
-}
+
+    public class CartItem
+    {
+        public int ProductId { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public int Quantity { get;

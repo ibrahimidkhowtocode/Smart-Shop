@@ -16,20 +16,5 @@
     <Compile Update="ProductsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Smart Shop\AddEditProductForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Smart Shop\AdminForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Smart Shop\CashierForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Smart Shop\Loginform.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Smart Shop\ProductsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
 </Project>

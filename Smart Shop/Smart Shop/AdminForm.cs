@@ -9,7 +9,7 @@ namespace Smart_Shop
     public partial class AdminForm : Form
     {
         private readonly SQLiteDatabase db;
-        private TabControl tabControl;
+        private TabControl mainTabControl;
 
         public AdminForm()
         {
@@ -21,179 +21,168 @@ namespace Smart_Shop
 
         private void InitializeUI()
         {
-            this.Text = "Admin Panel";
-            this.Size = new Size(1000, 700);
-            this.StartPosition = FormStartPosition.CenterScreen;
+            Text = "Admin Panel";
+            Size = new Size(1000, 700);
+            StartPosition = FormStartPosition.CenterScreen;
 
-            tabControl = new TabControl { Dock = DockStyle.Fill };
-            this.Controls.Add(tabControl);
+            mainTabControl = new TabControl { Dock = DockStyle.Fill };
+            Controls.Add(mainTabControl);
 
-            AddProductsTab();
-            AddDebtsTab();
-            AddHistoryTab();
-            AddExpensesTab();
-            AddCashiersTab();
+            AddTab("Products", InitializeProductsTab);
+            AddTab("Debts", InitializeDebtsTab);
+            AddTab("History", InitializeHistoryTab);
+            AddTab("Expenses", InitializeExpensesTab);
+            AddTab("Cashiers", InitializeCashiersTab);
         }
 
-        private void AddProductsTab()
+        private void AddTab(string name, Action<TabPage> initializer)
         {
-            var tab = new TabPage("Products");
-            tabControl.TabPages.Add(tab);
+            var tab = new TabPage(name);
+            mainTabControl.TabPages.Add(tab);
+            initializer(tab);
+        }
 
+        private void InitializeProductsTab(TabPage tab)
+        {
             var dgv = new DataGridView { Dock = DockStyle.Fill };
             tab.Controls.Add(dgv);
 
             var btnAdd = new Button { Text = "Add Product", Dock = DockStyle.Top };
-            btnAdd.Click += (s, e) => AddProduct();
+            btnAdd.Click += (s, e) => ShowAddProductForm();
             tab.Controls.Add(btnAdd);
 
             dgv.DataSource = db.GetDataTable("SELECT * FROM products");
         }
 
-        private void AddProduct()
+        private void ShowAddProductForm()
         {
-            using (var form = new Form())
+            using var form = new Form
             {
-                form.Text = "Add New Product";
-                form.Size = new Size(300, 200);
+                Text = "Add New Product",
+                Size = new Size(300, 200)
+            };
 
-                var txtName = new TextBox { PlaceholderText = "Name", Dock = DockStyle.Top };
-                var txtPrice = new TextBox { PlaceholderText = "Price", Dock = DockStyle.Top };
-                var btnSave = new Button { Text = "Save", Dock = DockStyle.Bottom };
+            var txtName = new TextBox { PlaceholderText = "Name", Dock = DockStyle.Top };
+            var txtPrice = new TextBox { PlaceholderText = "Price", Dock = DockStyle.Top };
+            var btnSave = new Button { Text = "Save", Dock = DockStyle.Bottom };
 
-                btnSave.Click += (s, e) =>
-                {
-                    db.ExecuteNonQuery(
-                        "INSERT INTO products (name, price) VALUES (@name, @price)",
-                        new SQLiteParameter("@name", txtName.Text),
-                        new SQLiteParameter("@price", double.Parse(txtPrice.Text))
-                    );
-                    form.DialogResult = DialogResult.OK;
-                };
+            btnSave.Click += (s, e) =>
+            {
+                db.ExecuteNonQuery(
+                    "INSERT INTO products (name, price) VALUES (@name, @price)",
+                    new SQLiteParameter("@name", txtName.Text),
+                    new SQLiteParameter("@price", double.Parse(txtPrice.Text))
+                );
+                form.DialogResult = DialogResult.OK;
+            };
 
-                form.Controls.AddRange(new Control[] { txtName, txtPrice, btnSave });
-                if (form.ShowDialog() == DialogResult.OK)
-                    LoadData();
+            form.Controls.AddRange(new Control[] { txtName, txtPrice, btnSave });
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                LoadData();
             }
         }
 
-        private void LoadData()
+        private void InitializeDebtsTab(TabPage tab)
         {
-            // Refresh all tabs
-            foreach (TabPage tab in tabControl.TabPages)
-            {
-                if (tab.Controls.Count > 0 && tab.Controls[0] is DataGridView dgv)
-                {
-                    dgv.DataSource = db.GetDataTable($"SELECT * FROM {tab.Text.ToLower()}");
-                }
-            }
-        }
-
-        private void AddDebtsTab()
-        {
-            var tab = new TabPage("Debts");
-            tabControl.TabPages.Add(tab);
-
             var dgv = new DataGridView { Dock = DockStyle.Fill };
             tab.Controls.Add(dgv);
-
             dgv.DataSource = db.GetDataTable("SELECT * FROM debts");
         }
 
-        private void AddHistoryTab()
+        private void InitializeHistoryTab(TabPage tab)
         {
-            var tab = new TabPage("History");
-            tabControl.TabPages.Add(tab);
-
             var dgv = new DataGridView { Dock = DockStyle.Fill };
             tab.Controls.Add(dgv);
-
             dgv.DataSource = db.GetDataTable("SELECT * FROM history ORDER BY timestamp DESC");
         }
 
-        private void AddExpensesTab()
+        private void InitializeExpensesTab(TabPage tab)
         {
-            var tab = new TabPage("Expenses");
-            tabControl.TabPages.Add(tab);
-
             var dgv = new DataGridView { Dock = DockStyle.Fill };
             tab.Controls.Add(dgv);
 
             var btnAdd = new Button { Text = "Add Expense", Dock = DockStyle.Top };
-            btnAdd.Click += (s, e) => AddExpense();
+            btnAdd.Click += (s, e) => ShowAddExpenseForm();
             tab.Controls.Add(btnAdd);
 
             dgv.DataSource = db.GetDataTable("SELECT * FROM expenses ORDER BY date DESC");
         }
 
-        private void AddExpense()
+        private void ShowAddExpenseForm()
         {
-            using (var form = new Form())
+            using var form = new Form
             {
-                form.Text = "Add New Expense";
-                form.Size = new Size(300, 200);
+                Text = "Add New Expense",
+                Size = new Size(300, 200)
+            };
 
-                var txtDesc = new TextBox { PlaceholderText = "Description", Dock = DockStyle.Top };
-                var txtAmount = new TextBox { PlaceholderText = "Amount", Dock = DockStyle.Top };
-                var btnSave = new Button { Text = "Save", Dock = DockStyle.Bottom };
+            var txtDesc = new TextBox { PlaceholderText = "Description", Dock = DockStyle.Top };
+            var txtAmount = new TextBox { PlaceholderText = "Amount", Dock = DockStyle.Top };
+            var btnSave = new Button { Text = "Save", Dock = DockStyle.Bottom };
 
-                btnSave.Click += (s, e) =>
-                {
-                    db.AddExpense(txtDesc.Text, double.Parse(txtAmount.Text));
-                    form.DialogResult = DialogResult.OK;
-                };
+            btnSave.Click += (s, e) =>
+            {
+                db.AddExpense(txtDesc.Text, double.Parse(txtAmount.Text));
+                form.DialogResult = DialogResult.OK;
+            };
 
-                form.Controls.AddRange(new Control[] { txtDesc, txtAmount, btnSave });
-                if (form.ShowDialog() == DialogResult.OK)
-                    LoadData();
+            form.Controls.AddRange(new Control[] { txtDesc, txtAmount, btnSave });
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                LoadData();
             }
         }
 
-        private void AddCashiersTab()
+        private void InitializeCashiersTab(TabPage tab)
         {
-            var tab = new TabPage("Cashiers");
-            tabControl.TabPages.Add(tab);
-
             var dgv = new DataGridView { Dock = DockStyle.Fill };
             tab.Controls.Add(dgv);
 
             var btnAdd = new Button { Text = "Add Cashier", Dock = DockStyle.Top };
-            btnAdd.Click += (s, e) => AddCashier();
+            btnAdd.Click += (s, e) => ShowAddCashierForm();
             tab.Controls.Add(btnAdd);
 
             dgv.DataSource = db.GetDataTable("SELECT * FROM cashiers");
         }
 
-        private void AddCashier()
+        private void ShowAddCashierForm()
         {
-            using (var form = new Form())
+            using var form = new Form
             {
-                form.Text = "Add New Cashier";
-                form.Size = new Size(300, 250);
+                Text = "Add New Cashier",
+                Size = new Size(300, 250)
+            };
 
-                var txtUser = new TextBox { PlaceholderText = "Username", Dock = DockStyle.Top };
-                var txtPass = new TextBox { PlaceholderText = "Password", Dock = DockStyle.Top };
-                var cmbWageType = new ComboBox { Dock = DockStyle.Top };
-                cmbWageType.Items.AddRange(new[] { "monthly", "hourly" });
-                var txtWageRate = new TextBox { PlaceholderText = "Wage Rate", Dock = DockStyle.Top };
-                var btnSave = new Button { Text = "Save", Dock = DockStyle.Bottom };
+            var txtUser = new TextBox { PlaceholderText = "Username", Dock = DockStyle.Top };
+            var txtPass = new TextBox { PlaceholderText = "Password", Dock = DockStyle.Top };
+            var cmbWageType = new ComboBox { Dock = DockStyle.Top };
+            cmbWageType.Items.AddRange(new[] { "monthly", "hourly" });
+            var txtWageRate = new TextBox { PlaceholderText = "Wage Rate", Dock = DockStyle.Top };
+            var btnSave = new Button { Text = "Save", Dock = DockStyle.Bottom };
 
-                btnSave.Click += (s, e) =>
-                {
-                    db.ExecuteNonQuery(
-                        "INSERT INTO cashiers (username, password, wage_type, wage_rate) VALUES (@user, @pass, @type, @rate)",
-                        new SQLiteParameter("@user", txtUser.Text),
-                        new SQLiteParameter("@pass", txtPass.Text),
-                        new SQLiteParameter("@type", cmbWageType.Text),
-                        new SQLiteParameter("@rate", double.Parse(txtWageRate.Text))
-                    );
-                    form.DialogResult = DialogResult.OK;
-                };
+            btnSave.Click += (s, e) =>
+            {
+                db.ExecuteNonQuery(
+                    "INSERT INTO cashiers (username, password, wage_type, wage_rate) VALUES (@user, @pass, @type, @rate)",
+                    new SQLiteParameter("@user", txtUser.Text),
+                    new SQLiteParameter("@pass", txtPass.Text),
+                    new SQLiteParameter("@type", cmbWageType.Text),
+                    new SQLiteParameter("@rate", double.Parse(txtWageRate.Text))
+                );
+                form.DialogResult = DialogResult.OK;
+            };
 
-                form.Controls.AddRange(new Control[] { txtUser, txtPass, cmbWageType, txtWageRate, btnSave });
-                if (form.ShowDialog() == DialogResult.OK)
-                    LoadData();
+            form.Controls.AddRange(new Control[] { txtUser, txtPass, cmbWageType, txtWageRate, btnSave });
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                LoadData();
             }
         }
-    }
-}
+
+        private void LoadData()
+        {
+            foreach (TabPage tab in mainTabControl.TabPages

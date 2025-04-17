@@ -4,7 +4,7 @@ using System.Data.SQLite;
 
 namespace Smart_Shop
 {
-    public sealed class SQLiteDatabase : IDisposable
+    public class SQLiteDatabase : IDisposable
     {
         private readonly SQLiteConnection connection;
 
@@ -58,7 +58,8 @@ namespace Smart_Shop
                     last_login TEXT,
                     sales_count INTEGER DEFAULT 0,
                     notes TEXT
-                );");
+                );
+            ");
         }
 
         public DataTable GetDataTable(string query, params SQLiteParameter[] parameters)
@@ -78,15 +79,6 @@ namespace Smart_Shop
             cmd.ExecuteNonQuery();
         }
 
-        public void AddExpense(string description, double amount)
-        {
-            ExecuteNonQuery(
-                "INSERT INTO expenses (description, amount) VALUES (@desc, @amount)",
-                new SQLiteParameter("@desc", description),
-                new SQLiteParameter("@amount", amount)
-            );
-        }
-
         public void LogHistory(string action, string details, string user)
         {
             ExecuteNonQuery(
@@ -101,7 +93,6 @@ namespace Smart_Shop
         {
             connection?.Close();
             connection?.Dispose();
-            GC.SuppressFinalize(this);
         }
     }
 }

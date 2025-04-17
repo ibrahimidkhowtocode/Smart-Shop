@@ -1,0 +1,14 @@
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart Shop.csproj.AssemblyReference.cache
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart_Shop.AddEditProductForm.resources
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\AdminForm.resources
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\CashierForm.resources
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart_Shop.LoginForm.resources
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart_Shop.ProductsForm.resources
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart Shop.csproj.GenerateResource.cache
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart Shop.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart Shop.AssemblyInfoInputs.cache
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart Shop.AssemblyInfo.cs
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart Shop.csproj.CoreCompileInputs.cache
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart Shop.sourcelink.json
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart_Shop.AdminForm.resources
+C:\Users\dadyyy\source\repos\Smart Shop\Smart Shop\obj\Debug\net8.0-windows\Smart_Shop.CashierForm.resources

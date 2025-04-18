@@ -16,22 +16,19 @@ namespace Smart_Shop
             if (expenseId.HasValue)
             {
                 this.Text = "Edit Expense";
-                LoadExpenseData();
+                var expense = SQLiteDatabase.GetExpense(expenseId.Value);
+                if (expense != null)
+                {
+                    txtDescription.Text = expense.Description;
+                    numAmount.Value = expense.Amount;
+                    txtCategory.Text = expense.Category;
+                    txtNotes.Text = expense.Notes;
+                }
             }
             else
             {
                 this.Text = "Add New Expense";
             }
-        }
-
-        private void LoadExpenseData()
-        {
-            // Load existing expense data
-            var expense = SQLiteDatabase.GetExpense(expenseId.Value);
-            txtDescription.Text = expense.Description;
-            numAmount.Value = expense.Amount;
-            txtCategory.Text = expense.Category;
-            txtNotes.Text = expense.Notes;
         }
 
         private void btnSave_Click(object sender, EventArgs e)

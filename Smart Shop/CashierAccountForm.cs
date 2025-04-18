@@ -5,32 +5,29 @@ namespace Smart_Shop
 {
     public partial class CashierAccountForm : Form
     {
-        private string username;
+        private string? username;
 
-        public CashierAccountForm(string existingUsername = null)
+        public CashierAccountForm(string? existingUsername = null)
         {
             InitializeComponent();
             username = existingUsername;
-            this.StartPosition = FormStartPosition.CenterScreen;
 
             if (!string.IsNullOrEmpty(username))
             {
                 this.Text = "Edit Cashier Account";
-                LoadCashierData();
+                var cashier = SQLiteDatabase.GetUser(username);
+                if (cashier != null)
+                {
+                    txtUsername.Text = cashier.Username;
+                    txtPassword.Text = cashier.Password;
+                    cmbWageType.Text = cashier.WageType;
+                    numWageAmount.Value = cashier.WageAmount;
+                }
             }
             else
             {
                 this.Text = "Create Cashier Account";
             }
-        }
-
-        private void LoadCashierData()
-        {
-            var cashier = SQLiteDatabase.GetUser(username);
-            txtUsername.Text = cashier.Username;
-            txtPassword.Text = cashier.Password;
-            cmbWageType.Text = cashier.WageType;
-            numWageAmount.Value = cashier.WageAmount;
         }
 
         private void btnSave_Click(object sender, EventArgs e)

@@ -17,138 +17,143 @@
 
         private void InitializeComponent()
         {
-            this.txtUsername = new System.Windows.Forms.TextBox();
-            this.txtPassword = new System.Windows.Forms.TextBox();
-            this.cmbWageType = new System.Windows.Forms.ComboBox();
-            this.numWageAmount = new System.Windows.Forms.NumericUpDown();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.numWageAmount)).BeginInit();
-            this.SuspendLayout();
+            txtUsername = new TextBox();
+            txtPassword = new TextBox();
+            cmbWageType = new ComboBox();
+            numWageAmount = new NumericUpDown();
+            btnSave = new Button();
+            btnCancel = new Button();
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
+            label4 = new Label();
+            ((System.ComponentModel.ISupportInitialize)numWageAmount).BeginInit();
+            SuspendLayout();
             // 
             // txtUsername
             // 
-            this.txtUsername.Location = new System.Drawing.Point(12, 36);
-            this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(360, 20);
-            this.txtUsername.TabIndex = 0;
+            txtUsername.Location = new Point(16, 55);
+            txtUsername.Margin = new Padding(4, 5, 4, 5);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new Size(479, 27);
+            txtUsername.TabIndex = 0;
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(12, 85);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(360, 20);
-            this.txtPassword.TabIndex = 1;
+            txtPassword.Location = new Point(16, 131);
+            txtPassword.Margin = new Padding(4, 5, 4, 5);
+            txtPassword.Name = "txtPassword";
+            txtPassword.Size = new Size(479, 27);
+            txtPassword.TabIndex = 1;
             // 
             // cmbWageType
             // 
-            this.cmbWageType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbWageType.FormattingEnabled = true;
-            this.cmbWageType.Items.AddRange(new object[] {
-            "Hourly",
-            "Monthly"});
-            this.cmbWageType.Location = new System.Drawing.Point(12, 134);
-            this.cmbWageType.Name = "cmbWageType";
-            this.cmbWageType.Size = new System.Drawing.Size(120, 21);
-            this.cmbWageType.TabIndex = 2;
+            cmbWageType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbWageType.FormattingEnabled = true;
+            cmbWageType.Items.AddRange(new object[] { "Hourly", "Monthly" });
+            cmbWageType.Location = new Point(16, 206);
+            cmbWageType.Margin = new Padding(4, 5, 4, 5);
+            cmbWageType.Name = "cmbWageType";
+            cmbWageType.Size = new Size(159, 28);
+            cmbWageType.TabIndex = 2;
             // 
             // numWageAmount
             // 
-            this.numWageAmount.DecimalPlaces = 2;
-            this.numWageAmount.Location = new System.Drawing.Point(150, 134);
-            this.numWageAmount.Maximum = new decimal(new int[] {
-            1000000,
-            0,
-            0,
-            0});
-            this.numWageAmount.Name = "numWageAmount";
-            this.numWageAmount.Size = new System.Drawing.Size(120, 20);
-            this.numWageAmount.TabIndex = 3;
+            numWageAmount.DecimalPlaces = 2;
+            numWageAmount.Location = new Point(200, 206);
+            numWageAmount.Margin = new Padding(4, 5, 4, 5);
+            numWageAmount.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
+            numWageAmount.Name = "numWageAmount";
+            numWageAmount.Size = new Size(160, 27);
+            numWageAmount.TabIndex = 3;
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(216, 180);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 4;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            btnSave.Location = new Point(288, 277);
+            btnSave.Margin = new Padding(4, 5, 4, 5);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(100, 35);
+            btnSave.TabIndex = 4;
+            btnSave.Text = "Save";
+            btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnSave_Click;
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(297, 180);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 5;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            btnCancel.Location = new Point(396, 277);
+            btnCancel.Margin = new Padding(4, 5, 4, 5);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(100, 35);
+            btnCancel.TabIndex = 5;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 20);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 13);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "Username:";
+            label1.AutoSize = true;
+            label1.Location = new Point(16, 31);
+            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(78, 20);
+            label1.TabIndex = 6;
+            label1.Text = "Username:";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 69);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(56, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "Password:";
+            label2.AutoSize = true;
+            label2.Location = new Point(16, 106);
+            label2.Margin = new Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(73, 20);
+            label2.TabIndex = 7;
+            label2.Text = "Password:";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 118);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(65, 13);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "Wage Type:";
+            label3.AutoSize = true;
+            label3.Location = new Point(16, 182);
+            label3.Margin = new Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(85, 20);
+            label3.TabIndex = 8;
+            label3.Text = "Wage Type:";
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(147, 118);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(79, 13);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "Wage Amount:";
+            label4.AutoSize = true;
+            label4.Location = new Point(196, 182);
+            label4.Margin = new Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new Size(107, 20);
+            label4.TabIndex = 9;
+            label4.Text = "Wage Amount:";
             // 
             // CashierAccountForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 215);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.numWageAmount);
-            this.Controls.Add(this.cmbWageType);
-            this.Controls.Add(this.txtPassword);
-            this.Controls.Add(this.txtUsername);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "CashierAccountForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Cashier Account";
-            ((System.ComponentModel.ISupportInitialize)(this.numWageAmount)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(512, 331);
+            Controls.Add(label4);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(btnCancel);
+            Controls.Add(btnSave);
+            Controls.Add(numWageAmount);
+            Controls.Add(cmbWageType);
+            Controls.Add(txtPassword);
+            Controls.Add(txtUsername);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Margin = new Padding(4, 5, 4, 5);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "CashierAccountForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Cashier Account";
+            ((System.ComponentModel.ISupportInitialize)numWageAmount).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 

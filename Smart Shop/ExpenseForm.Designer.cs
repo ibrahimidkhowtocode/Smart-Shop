@@ -17,134 +17,141 @@
 
         private void InitializeComponent()
         {
-            this.txtDescription = new System.Windows.Forms.TextBox();
-            this.numAmount = new System.Windows.Forms.NumericUpDown();
-            this.txtCategory = new System.Windows.Forms.TextBox();
-            this.txtNotes = new System.Windows.Forms.TextBox();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.numAmount)).BeginInit();
-            this.SuspendLayout();
+            txtDescription = new TextBox();
+            numAmount = new NumericUpDown();
+            txtCategory = new TextBox();
+            txtNotes = new TextBox();
+            btnSave = new Button();
+            btnCancel = new Button();
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
+            label4 = new Label();
+            ((System.ComponentModel.ISupportInitialize)numAmount).BeginInit();
+            SuspendLayout();
             // 
             // txtDescription
             // 
-            this.txtDescription.Location = new System.Drawing.Point(12, 36);
-            this.txtDescription.Name = "txtDescription";
-            this.txtDescription.Size = new System.Drawing.Size(360, 20);
-            this.txtDescription.TabIndex = 0;
+            txtDescription.Location = new Point(16, 55);
+            txtDescription.Margin = new Padding(4, 5, 4, 5);
+            txtDescription.Name = "txtDescription";
+            txtDescription.Size = new Size(479, 27);
+            txtDescription.TabIndex = 0;
             // 
             // numAmount
             // 
-            this.numAmount.DecimalPlaces = 2;
-            this.numAmount.Location = new System.Drawing.Point(12, 85);
-            this.numAmount.Maximum = new decimal(new int[] {
-            1000000,
-            0,
-            0,
-            0});
-            this.numAmount.Name = "numAmount";
-            this.numAmount.Size = new System.Drawing.Size(120, 20);
-            this.numAmount.TabIndex = 1;
+            numAmount.DecimalPlaces = 2;
+            numAmount.Location = new Point(16, 131);
+            numAmount.Margin = new Padding(4, 5, 4, 5);
+            numAmount.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
+            numAmount.Name = "numAmount";
+            numAmount.Size = new Size(160, 27);
+            numAmount.TabIndex = 1;
             // 
             // txtCategory
             // 
-            this.txtCategory.Location = new System.Drawing.Point(150, 85);
-            this.txtCategory.Name = "txtCategory";
-            this.txtCategory.Size = new System.Drawing.Size(222, 20);
-            this.txtCategory.TabIndex = 2;
+            txtCategory.Location = new Point(200, 131);
+            txtCategory.Margin = new Padding(4, 5, 4, 5);
+            txtCategory.Name = "txtCategory";
+            txtCategory.Size = new Size(295, 27);
+            txtCategory.TabIndex = 2;
             // 
             // txtNotes
             // 
-            this.txtNotes.Location = new System.Drawing.Point(12, 134);
-            this.txtNotes.Multiline = true;
-            this.txtNotes.Name = "txtNotes";
-            this.txtNotes.Size = new System.Drawing.Size(360, 80);
-            this.txtNotes.TabIndex = 3;
+            txtNotes.Location = new Point(16, 206);
+            txtNotes.Margin = new Padding(4, 5, 4, 5);
+            txtNotes.Multiline = true;
+            txtNotes.Name = "txtNotes";
+            txtNotes.Size = new Size(479, 121);
+            txtNotes.TabIndex = 3;
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(216, 230);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 4;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            btnSave.Location = new Point(288, 354);
+            btnSave.Margin = new Padding(4, 5, 4, 5);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(100, 35);
+            btnSave.TabIndex = 4;
+            btnSave.Text = "Save";
+            btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnSave_Click;
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(297, 230);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 5;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            btnCancel.Location = new Point(396, 354);
+            btnCancel.Margin = new Padding(4, 5, 4, 5);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(100, 35);
+            btnCancel.TabIndex = 5;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 20);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(63, 13);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "Description:";
+            label1.AutoSize = true;
+            label1.Location = new Point(16, 31);
+            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(88, 20);
+            label1.TabIndex = 6;
+            label1.Text = "Description:";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 69);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(46, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "Amount:";
+            label2.AutoSize = true;
+            label2.Location = new Point(16, 106);
+            label2.Margin = new Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(65, 20);
+            label2.TabIndex = 7;
+            label2.Text = "Amount:";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(147, 69);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(52, 13);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "Category:";
+            label3.AutoSize = true;
+            label3.Location = new Point(196, 106);
+            label3.Margin = new Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(72, 20);
+            label3.TabIndex = 8;
+            label3.Text = "Category:";
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 118);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(38, 13);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "Notes:";
+            label4.AutoSize = true;
+            label4.Location = new Point(16, 182);
+            label4.Margin = new Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new Size(51, 20);
+            label4.TabIndex = 9;
+            label4.Text = "Notes:";
             // 
             // ExpenseForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 265);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.txtNotes);
-            this.Controls.Add(this.txtCategory);
-            this.Controls.Add(this.numAmount);
-            this.Controls.Add(this.txtDescription);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "ExpenseForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Expense";
-            ((System.ComponentModel.ISupportInitialize)(this.numAmount)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(512, 408);
+            Controls.Add(label4);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(btnCancel);
+            Controls.Add(btnSave);
+            Controls.Add(txtNotes);
+            Controls.Add(txtCategory);
+            Controls.Add(numAmount);
+            Controls.Add(txtDescription);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Margin = new Padding(4, 5, 4, 5);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "ExpenseForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Expense";
+            ((System.ComponentModel.ISupportInitialize)numAmount).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 

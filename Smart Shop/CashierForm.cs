@@ -41,6 +41,7 @@ namespace Smart_Shop
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect
             };
             productsGrid.CellDoubleClick += AddToCart;
+            productsGrid.DataSource = SQLiteDatabase.GetProducts();
 
             // Cart Panel
             Panel cartPanel = new Panel { Dock = DockStyle.Fill };
@@ -133,30 +134,25 @@ namespace Smart_Shop
 
         private void LoadProducts()
         {
-            if (tabSales.Controls[0] is SplitContainer splitContainer)
+            if (tabSales.Controls[0] is SplitContainer splitContainer &&
+                splitContainer.Panel1.Controls[0] is DataGridView productsGrid)
             {
-                if (splitContainer.Panel1.Controls[0] is DataGridView productsGrid)
-                {
-                    productsGrid.DataSource = SQLiteDatabase.GetProducts();
-                }
+                productsGrid.DataSource = SQLiteDatabase.GetProducts();
             }
         }
 
-        private void AddToCart(object sender, DataGridViewCellEventArgs e)
+        private void AddToCart(object? sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+            if (e.RowIndex >= 0 && sender is DataGridView grid &&
+                grid.Rows[e.RowIndex].DataBoundItem is DataRowView row)
             {
-                DataGridView grid = (DataGridView)sender;
-                DataRowView row = (DataRowView)grid.Rows[e.RowIndex].DataBoundItem;
-
                 CartItem item = new CartItem
                 {
                     ProductId = Convert.ToInt32(row["Id"]),
-                    Name = row["Name"].ToString(),
+                    Name = row["Name"]?.ToString() ?? string.Empty,
                     Price = Convert.ToDecimal(row["Price"]),
                     Quantity = 1
                 };
-
                 cartItems.Add(item);
                 RefreshCart();
             }
@@ -164,38 +160,40 @@ namespace Smart_Shop
 
         private void RefreshCart()
         {
-            if (tabSales.Controls[0] is SplitContainer splitContainer)
+            if (tabSales.Controls[0] is SplitContainer splitContainer &&
+                splitContainer.Panel2.Controls[0] is Panel cartPanel)
             {
-                if (splitContainer.Panel2.Controls[0] is Panel cartPanel)
+                foreach (Control control in cartPanel.Controls)
                 {
-                    foreach (Control control in cartPanel.Controls)
+                    if (control is DataGridView cartGrid)
                     {
-                        if (control is DataGridView cartGrid)
-                        {
-                            cartGrid.DataSource = null;
-                            cartGrid.DataSource = cartItems;
-                        }
+                        cartGrid.DataSource = null;
+                        cartGrid.DataSource = cartItems;
+                        return;
                     }
                 }
             }
         }
 
-        private void CompleteSale_Click(object sender, EventArgs e)
+        private void CompleteSale_Click(object? sender, EventArgs e)
         {
             if (cartItems.Count == 0)
             {
-                MessageBox.Show("Please add items to cart", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please add items to cart", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            // Get payment method
             string paymentMethod = "";
-            foreach (Control control in ((Button)sender).Parent.Controls)
+            if (sender is Button button && button.Parent is Panel panel)
             {
-                if (control is ComboBox comboBox)
+                foreach (Control control in panel.Controls)
                 {
-                    paymentMethod = comboBox.Text;
-                    break;
+                    if (control is ComboBox combo)
+                    {
+                        paymentMethod = combo.Text;
+                        break;
+                    }
                 }
             }
 
@@ -217,14 +215,12 @@ namespace Smart_Shop
         {
             try
             {
-                // Process each item in cart
                 foreach (CartItem item in cartItems)
                 {
                     SQLiteDatabase.RecordSale(item.ProductId, item.Quantity, item.Price,
                         paymentMethod, currentUsername);
                 }
 
-                // If debt, record it
                 if (paymentMethod == "Debt")
                 {
                     decimal total = cartItems.Sum(i => i.Total);
@@ -268,14 +264,14 @@ namespace Smart_Shop
         {
             Application.Exit();
         }
-    }
 
-    public class CartItem
-    {
-        public int ProductId { get; set; }
-        public string Name { get; set; }
-        public decimal Price { get; set; }
-        public int Quantity { get; set; }
-        public decimal Total => Price * Quantity;
+        public class CartItem
+        {
+            public int ProductId { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public decimal Price { get; set; }
+            public int Quantity { get; set; }
+            public decimal Total => Price * Quantity;
+        }
     }
 }

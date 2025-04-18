@@ -5,65 +5,82 @@ namespace Smart_Shop
 {
     public partial class AddEditProductForm : Form
     {
-        public string Barcode { get; private set; } = string.Empty;
-        public string ItemName { get; private set; } = string.Empty;
-        public decimal PurchasePrice { get; private set; }
-        public decimal SalePrice { get; private set; }
-        public int StockQuantity { get; private set; }
-        public int MinStockLevel { get; private set; }
+        private int? productId;
 
-        public AddEditProductForm()
+        public AddEditProductForm() : this(null, "", 0m, 0m, 0, "") { }
+
+        public AddEditProductForm(int? id, string name, decimal price, decimal cost, int quantity, string barcode)
         {
             InitializeComponent();
-        }
+            productId = id;
+            txtName.Text = name;
+            numPrice.Value = price;
+            numCost.Value = cost;
+            numQuantity.Value = quantity;
+            txtBarcode.Text = barcode;
 
-        private void BtnSave_Click(object sender, EventArgs e)
-        {
-            if (!ValidateInputs()) return;
-
-            Barcode = txtBarcode.Text;
-            ItemName = txtName.Text;
-            PurchasePrice = numPurchasePrice.Value;
-            SalePrice = numSalePrice.Value;
-            StockQuantity = (int)numQuantity.Value;
-            MinStockLevel = (int)numMinStock.Value;
-
-            DialogResult = DialogResult.OK;
-            Close();
-        }
-
-        private bool ValidateInputs()
-        {
-            if (string.IsNullOrWhiteSpace(txtBarcode.Text))
+            if (productId.HasValue)
             {
-                ShowError("Barcode is required");
-                return false;
+                this.Text = "Edit Product";
             }
+            else
+            {
+                this.Text = "Add New Product";
+            }
+        }
 
+        private void btnSave_Click(object sender, EventArgs e)
+        {
             if (string.IsNullOrWhiteSpace(txtName.Text))
             {
-                ShowError("Product name is required");
-                return false;
+                MessageBox.Show("Please enter product name", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            if (numSalePrice.Value <= 0)
+            if (numPrice.Value <= 0 || numCost.Value <= 0)
             {
-                ShowError("Sale price must be greater than 0");
-                return false;
+                MessageBox.Show("Please enter valid price and cost", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            return true;
+            if (productId.HasValue)
+            {
+                // Update existing product
+                SQLiteDatabase.ExecuteNonQuery(
+                    @"UPDATE Products SET Name=@name, Price=@price, Cost=@cost, 
+                     Quantity=@quantity, Barcode=@barcode WHERE Id=@id",
+                    ("@name", txtName.Text),
+                    ("@price", numPrice.Value),
+                    ("@cost", numCost.Value),
+                    ("@quantity", (int)numQuantity.Value),
+                    ("@barcode", txtBarcode.Text),
+                    ("@id", productId.Value)
+                );
+            }
+            else
+            {
+                // Add new product
+                SQLiteDatabase.ExecuteNonQuery(
+                    @"INSERT INTO Products (Name, Price, Cost, Quantity, Barcode) 
+                     VALUES (@name, @price, @cost, @quantity, @barcode)",
+                    ("@name", txtName.Text),
+                    ("@price", numPrice.Value),
+                    ("@cost", numCost.Value),
+                    ("@quantity", (int)numQuantity.Value),
+                    ("@barcode", txtBarcode.Text)
+                );
+            }
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
 
-        private void BtnCancel_Click(object sender, EventArgs e)
+        private void btnCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
-            Close();
-        }
-
-        private static void ShowError(string message)
-        {
-            MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
         }
     }
 }

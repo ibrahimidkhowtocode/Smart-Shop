@@ -8,7 +8,6 @@ namespace Smart_Shop
 {
     public partial class AdminForm : Form
     {
-        private string currentUsername;
 
         public AdminForm()
         {
@@ -157,7 +156,6 @@ namespace Smart_Shop
 
         private void LoadData()
         {
-            // Refresh all data grids
             foreach (TabPage tab in tabControl1.TabPages)
             {
                 foreach (Control control in tab.Controls)
@@ -196,29 +194,31 @@ namespace Smart_Shop
 
         private void EditSelectedCashier(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid.SelectedRows.Count > 0 &&
+                grid.SelectedRows[0].DataBoundItem is DataRowView row &&
+                row["Username"] is string username)
             {
-                DataRowView row = (DataRowView)grid.SelectedRows[0].DataBoundItem;
-                new CashierAccountForm(row["Username"].ToString()).ShowDialog();
+                new CashierAccountForm(username).ShowDialog();
                 LoadData();
             }
         }
 
         private void DeactivateCashier(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid.SelectedRows.Count > 0 &&
+                grid.SelectedRows[0].DataBoundItem is DataRowView row &&
+                row["Username"] is string username)
             {
-                DataRowView row = (DataRowView)grid.SelectedRows[0].DataBoundItem;
-                SQLiteDatabase.DeactivateUser(row["Username"].ToString());
+                SQLiteDatabase.DeactivateUser(username);
                 LoadData();
             }
         }
 
         private void EditSelectedExpense(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid.SelectedRows.Count > 0 &&
+                grid.SelectedRows[0].DataBoundItem is DataRowView row)
             {
-                DataRowView row = (DataRowView)grid.SelectedRows[0].DataBoundItem;
                 new ExpenseForm(Convert.ToInt32(row["Id"])).ShowDialog();
                 LoadData();
             }
@@ -226,9 +226,9 @@ namespace Smart_Shop
 
         private void DeleteSelectedExpense(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid.SelectedRows.Count > 0 &&
+                grid.SelectedRows[0].DataBoundItem is DataRowView row)
             {
-                DataRowView row = (DataRowView)grid.SelectedRows[0].DataBoundItem;
                 SQLiteDatabase.DeleteExpense(Convert.ToInt32(row["Id"]));
                 LoadData();
             }

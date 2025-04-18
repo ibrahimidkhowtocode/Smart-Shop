@@ -6,7 +6,7 @@ namespace Smart_Shop
     public partial class AdminForm : Form
     {
         private readonly SQLiteDatabase db;
-        private TabControl mainTabControl;
+        private readonly TabControl mainTabControl = new TabControl();
 
         public AdminForm()
         {
@@ -17,7 +17,7 @@ namespace Smart_Shop
 
         private void InitializeUI()
         {
-            mainTabControl = new TabControl { Dock = DockStyle.Fill };
+            mainTabControl.Dock = DockStyle.Fill;
             Controls.Add(mainTabControl);
 
             AddTab("Products", InitializeProductsTab);
@@ -42,17 +42,17 @@ namespace Smart_Shop
 
         private void InitializeHistoryTab(TabPage tabPage)
         {
-            // Implement history tab
+            // Your existing history tab implementation
         }
 
         private void InitializeExpensesTab(TabPage tabPage)
         {
-            // Implement expenses tab
+            // Your existing expenses tab implementation
         }
 
         private void InitializeCashiersTab(TabPage tabPage)
         {
-            // Implement cashiers tab
+            // Your existing cashiers tab implementation
         }
     }
 }

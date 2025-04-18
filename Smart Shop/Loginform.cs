@@ -38,7 +38,13 @@ namespace Smart_Shop
                     return;
                 }
 
-                string role = result.Rows[0]["Role"].ToString();
+                string role = result.Rows[0]["Role"]?.ToString() ?? string.Empty;
+                if (string.IsNullOrEmpty(role))
+                {
+                    MessageBox.Show("Invalid user role");
+                    return;
+                }
+
                 Form nextForm = role switch
                 {
                     "Admin" => new AdminForm(),

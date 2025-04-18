@@ -61,7 +61,7 @@ namespace Smart_Shop
             Close();
         }
 
-        private void ShowError(string message)
+        private static void ShowError(string message)
         {
             MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }

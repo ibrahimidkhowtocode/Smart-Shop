@@ -7,7 +7,7 @@ namespace Smart_Shop
     public partial class ProductsForm : Form
     {
         private readonly SQLiteDatabase db;
-        private DataGridView dataGridViewProducts;
+        private readonly DataGridView dataGridViewProducts = new DataGridView();
 
         public ProductsForm(SQLiteDatabase database)
         {
@@ -19,14 +19,10 @@ namespace Smart_Shop
 
         private void InitializeProductsGrid()
         {
-            dataGridViewProducts = new DataGridView
-            {
-                Dock = DockStyle.Fill,
-                AllowUserToAddRows = false,
-                AllowUserToDeleteRows = false,
-                ReadOnly = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-            };
+            dataGridViewProducts.Dock = DockStyle.Fill;
+            dataGridViewProducts.AllowUserToAddRows = false;
+            dataGridViewProducts.AllowUserToDeleteRows = false;
+            dataGridViewProducts.ReadOnly = true;
             Controls.Add(dataGridViewProducts);
         }
 

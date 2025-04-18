@@ -38,6 +38,14 @@ namespace Smart_Shop
                     Quantity INTEGER NOT NULL,
                     MinStockLevel INTEGER NOT NULL
                 )");
+
+            ExecuteNonQuery(@"
+                CREATE TABLE IF NOT EXISTS History (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Action TEXT NOT NULL,
+                    Details TEXT NOT NULL,
+                    Timestamp TEXT NOT NULL
+                )");
         }
 
         public DataTable GetDataTable(string query, params SQLiteParameter[] parameters)
@@ -55,6 +63,16 @@ namespace Smart_Shop
             using var command = new SQLiteCommand(query, connection);
             command.Parameters.AddRange(parameters);
             return command.ExecuteNonQuery();
+        }
+
+        public void LogHistory(string action, string details)
+        {
+            ExecuteNonQuery(
+                "INSERT INTO History (Action, Details, Timestamp) VALUES (@action, @details, @timestamp)",
+                new SQLiteParameter("@action", action),
+                new SQLiteParameter("@details", details),
+                new SQLiteParameter("@timestamp", DateTime.Now)
+            );
         }
 
         public void Dispose()

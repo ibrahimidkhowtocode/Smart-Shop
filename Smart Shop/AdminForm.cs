@@ -1,32 +1,58 @@
 ﻿using System;
-using System.Data.SQLite;
 using System.Windows.Forms;
 
-namespace StoreManagementSystem
+namespace Smart_Shop
 {
     public partial class AdminForm : Form
     {
+        private readonly SQLiteDatabase db;
+        private TabControl mainTabControl;
+
         public AdminForm()
         {
             InitializeComponent();
-            LoadDashboard();
+            db = new SQLiteDatabase();
+            InitializeUI();
         }
 
-        private void LoadDashboard()
+        private void InitializeUI()
         {
-            lblWelcome.Text = "Welcome, Admin! Today is " + DateTime.Now.ToString("dddd, MMMM dd");
+            mainTabControl = new TabControl { Dock = DockStyle.Fill };
+            Controls.Add(mainTabControl);
+
+            AddTab("Products", InitializeProductsTab);
+            AddTab("History", InitializeHistoryTab);
+            AddTab("Expenses", InitializeExpensesTab);
+            AddTab("Cashiers", InitializeCashiersTab);
         }
 
-        private void dashboardToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddTab(string text, Action<TabPage> initializeAction)
         {
-            LoadDashboard();
+            var tabPage = new TabPage(text);
+            mainTabControl.TabPages.Add(tabPage);
+            initializeAction(tabPage);
         }
 
-        private void productsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void InitializeProductsTab(TabPage tabPage)
         {
-            MessageBox.Show("We'll add products here later!");
+            var productsForm = new ProductsForm(db) { TopLevel = false };
+            tabPage.Controls.Add(productsForm);
+            productsForm.Show();
         }
 
-        // Add similar methods for other menu items
+        private void InitializeHistoryTab(TabPage tabPage)
+        {
+            // Implement history tab
+        }
+
+        private void InitializeExpensesTab(TabPage tabPage)
+        {
+            // Implement expenses tab
+        }
+
+        private void InitializeCashiersTab(TabPage tabPage)
+        {
+            // Implement cashiers tab
+        }
     }
 }

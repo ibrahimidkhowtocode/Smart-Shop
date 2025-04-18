@@ -1,6 +1,6 @@
 ﻿namespace Smart_Shop
 {
-    partial class AdminForm
+    partial class ProductsForm
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -17,8 +17,8 @@
         {
             this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Admin Dashboard";
+            this.ClientSize = new System.Drawing.Size(600, 400);
+            this.Text = "Products Management";
         }
     }
 }

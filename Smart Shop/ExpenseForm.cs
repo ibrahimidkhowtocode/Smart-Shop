@@ -47,19 +47,27 @@ namespace Smart_Shop
                 return;
             }
 
-            if (expenseId.HasValue)
+            try
             {
-                SQLiteDatabase.UpdateExpense(expenseId.Value, txtDescription.Text,
-                    numAmount.Value, txtCategory.Text, txtNotes.Text);
-            }
-            else
-            {
-                SQLiteDatabase.AddExpense(txtDescription.Text, numAmount.Value,
-                    txtCategory.Text, txtNotes.Text);
-            }
+                if (expenseId.HasValue)
+                {
+                    SQLiteDatabase.UpdateExpense(expenseId.Value, txtDescription.Text,
+                        numAmount.Value, txtCategory.Text, txtNotes.Text);
+                }
+                else
+                {
+                    SQLiteDatabase.AddExpense(txtDescription.Text, numAmount.Value,
+                        txtCategory.Text, txtNotes.Text);
+                }
 
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving expense: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

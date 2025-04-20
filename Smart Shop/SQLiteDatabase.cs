@@ -2,6 +2,10 @@
 using System.Data.SQLite;
 using System.Data;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows.Forms;
+using System.IO;
 
 namespace Smart_Shop
 {
@@ -9,7 +13,6 @@ namespace Smart_Shop
     {
         private static string connectionString = "Data Source=SmartShop.db;Version=3;";
 
-        // Helper classes for data records
         public class ProductRecord
         {
             public int Id { get; set; }
@@ -54,14 +57,27 @@ namespace Smart_Shop
             InitializeDatabase();
         }
 
-        public static void InitializeDatabase()
+        private static string HashPassword(string password)
         {
+            using (var sha256 = SHA256.Create())
+            {
+                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+            }
+        }
+
+        private static void InitializeDatabase()
+        {
+            if (!File.Exists("SmartShop.db"))
+            {
+                SQLiteConnection.CreateFile("SmartShop.db");
+            }
+
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 conn.Open();
 
-                // Users table
-                string usersTable = @"CREATE TABLE IF NOT EXISTS Users (
+                ExecuteNonQueryWithConnection(@"CREATE TABLE IF NOT EXISTS Users (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Username TEXT NOT NULL UNIQUE,
                     Password TEXT NOT NULL,
@@ -72,10 +88,9 @@ namespace Smart_Shop
                     LastLogin TEXT,
                     TotalSales INTEGER DEFAULT 0,
                     DateCreated TEXT DEFAULT CURRENT_TIMESTAMP
-                );";
+                )", conn);
 
-                // Products table
-                string productsTable = @"CREATE TABLE IF NOT EXISTS Products (
+                ExecuteNonQueryWithConnection(@"CREATE TABLE IF NOT EXISTS Products (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Name TEXT NOT NULL,
                     Barcode TEXT UNIQUE,
@@ -84,10 +99,9 @@ namespace Smart_Shop
                     Quantity INTEGER NOT NULL,
                     MinStockLevel INTEGER DEFAULT 5,
                     LastRestocked TEXT
-                );";
+                )", conn);
 
-                // Sales table
-                string salesTable = @"CREATE TABLE IF NOT EXISTS Sales (
+                ExecuteNonQueryWithConnection(@"CREATE TABLE IF NOT EXISTS Sales (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     ProductId INTEGER,
                     Quantity INTEGER,
@@ -98,10 +112,9 @@ namespace Smart_Shop
                     CashierId INTEGER,
                     FOREIGN KEY(ProductId) REFERENCES Products(Id),
                     FOREIGN KEY(CashierId) REFERENCES Users(Id)
-                );";
+                )", conn);
 
-                // Debts table
-                string debtsTable = @"CREATE TABLE IF NOT EXISTS Debts (
+                ExecuteNonQueryWithConnection(@"CREATE TABLE IF NOT EXISTS Debts (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     CustomerName TEXT NOT NULL,
                     CustomerPhone TEXT,
@@ -114,10 +127,19 @@ namespace Smart_Shop
                     CashierId INTEGER,
                     Notes TEXT,
                     FOREIGN KEY(CashierId) REFERENCES Users(Id)
-                );";
+                )", conn);
 
-                // Expenses table
-                string expensesTable = @"CREATE TABLE IF NOT EXISTS Expenses (
+                ExecuteNonQueryWithConnection(@"CREATE TABLE IF NOT EXISTS DebtPayments (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    DebtId INTEGER NOT NULL,
+                    Amount REAL NOT NULL,
+                    PaymentDate TEXT DEFAULT CURRENT_TIMESTAMP,
+                    CashierId INTEGER,
+                    FOREIGN KEY(DebtId) REFERENCES Debts(Id),
+                    FOREIGN KEY(CashierId) REFERENCES Users(Id)
+                )", conn);
+
+                ExecuteNonQueryWithConnection(@"CREATE TABLE IF NOT EXISTS Expenses (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Description TEXT NOT NULL,
                     Amount REAL NOT NULL,
@@ -126,10 +148,9 @@ namespace Smart_Shop
                     RecordedBy INTEGER,
                     Notes TEXT,
                     FOREIGN KEY(RecordedBy) REFERENCES Users(Id)
-                );";
+                )", conn);
 
-                // Requests table
-                string requestsTable = @"CREATE TABLE IF NOT EXISTS Requests (
+                ExecuteNonQueryWithConnection(@"CREATE TABLE IF NOT EXISTS Requests (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Type TEXT NOT NULL,
                     Content TEXT NOT NULL,
@@ -141,47 +162,34 @@ namespace Smart_Shop
                     Notes TEXT,
                     FOREIGN KEY(CreatedBy) REFERENCES Users(Id),
                     FOREIGN KEY(ProcessedBy) REFERENCES Users(Id)
-                );";
+                )", conn);
 
-                // CashierNotes table
-                string cashierNotesTable = @"CREATE TABLE IF NOT EXISTS CashierNotes (
+                ExecuteNonQueryWithConnection(@"CREATE TABLE IF NOT EXISTS CashierNotes (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     CashierId INTEGER NOT NULL,
                     NoteDate TEXT DEFAULT CURRENT_TIMESTAMP,
                     Notes TEXT NOT NULL,
                     FOREIGN KEY(CashierId) REFERENCES Users(Id)
-                );";
+                )", conn);
 
-                // Execute all table creation commands
-                ExecuteNonQuery(usersTable, conn);
-                ExecuteNonQuery(productsTable, conn);
-                ExecuteNonQuery(salesTable, conn);
-                ExecuteNonQuery(debtsTable, conn);
-                ExecuteNonQuery(expensesTable, conn);
-                ExecuteNonQuery(requestsTable, conn);
-                ExecuteNonQuery(cashierNotesTable, conn);
-
-                // Insert default admin if not exists
-                string checkAdmin = "SELECT COUNT(*) FROM Users WHERE Username='admin'";
-                if ((long)ExecuteScalar(checkAdmin, conn) == 0)
+                string checkAdmin = "SELECT COUNT(*) FROM Users WHERE Username='admin' AND Role='Admin'";
+                var adminCount = ExecuteScalarWithConnection(checkAdmin, conn);
+                if (adminCount != null && Convert.ToInt64(adminCount) == 0)
                 {
-                    string insertAdmin = @"INSERT INTO Users (Username, Password, Role) 
-                                        VALUES ('admin', 'admin2324142', 'admin')";
-                    ExecuteNonQuery(insertAdmin, conn);
-                }
+                    ExecuteNonQueryWithConnection(
+                        @"INSERT INTO Users (Username, Password, Role, IsActive) 
+                        VALUES ('admin', @password, 'Admin', 1)",
+                        conn,
+                        ("@password", HashPassword("Admin@1234"))
+                    );
 
-                // Insert default cashier if not exists
-                string checkCashier = "SELECT COUNT(*) FROM Users WHERE Username='cashier'";
-                if ((long)ExecuteScalar(checkCashier, conn) == 0)
-                {
-                    string insertCashier = @"INSERT INTO Users (Username, Password, Role, WageType, WageAmount) 
-                                          VALUES ('cashier', 'cashier', 'cashier', 'Hourly', 10.0)";
-                    ExecuteNonQuery(insertCashier, conn);
+                    MessageBox.Show("Default admin created:\nUsername: admin\nPassword: Admin@1234",
+                        "Database Initialized", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
 
-        private static void ExecuteNonQuery(string commandText, SQLiteConnection connection)
+        private static void ExecuteNonQueryWithConnection(string commandText, SQLiteConnection connection)
         {
             using (SQLiteCommand cmd = new SQLiteCommand(commandText, connection))
             {
@@ -189,7 +197,19 @@ namespace Smart_Shop
             }
         }
 
-        private static object ExecuteScalar(string commandText, SQLiteConnection connection)
+        private static void ExecuteNonQueryWithConnection(string commandText, SQLiteConnection connection, params (string name, object value)[] parameters)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand(commandText, connection))
+            {
+                foreach (var param in parameters)
+                {
+                    cmd.Parameters.AddWithValue(param.name, param.value);
+                }
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private static object? ExecuteScalarWithConnection(string commandText, SQLiteConnection connection)
         {
             using (SQLiteCommand cmd = new SQLiteCommand(commandText, connection))
             {
@@ -197,60 +217,159 @@ namespace Smart_Shop
             }
         }
 
-        // Product Methods
+        public static void ExecuteNonQuery(string query, params (string name, object value)[] parameters)
+        {
+            using (var conn = new SQLiteConnection(connectionString))
+            {
+                conn.Open();
+                using (var cmd = new SQLiteCommand(query, conn))
+                {
+                    foreach (var param in parameters)
+                    {
+                        cmd.Parameters.AddWithValue(param.name, param.value);
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static bool ValidateUser(string username, string password)
+        {
+            using (var conn = new SQLiteConnection(connectionString))
+            {
+                conn.Open();
+                string hashedInput = HashPassword(password);
+
+                using (var cmd = new SQLiteCommand(
+                    "SELECT Password FROM Users WHERE Username=@username AND IsActive=1", conn))
+                {
+                    cmd.Parameters.AddWithValue("@username", username);
+                    var result = cmd.ExecuteScalar();
+
+                    if (result == null)
+                    {
+                        return false;
+                    }
+
+                    string storedHash = result.ToString() ?? string.Empty;
+                    return storedHash.Equals(hashedInput);
+                }
+            }
+        }
+
         public static DataTable GetProducts()
         {
             return GetDataTable("SELECT * FROM Products");
         }
 
-        public static List<ProductRecord> GetProductList()
+        public static ProductRecord? GetProduct(int id)
         {
-            var products = new List<ProductRecord>();
             using (var conn = new SQLiteConnection(connectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM Products", conn))
-                using (var reader = cmd.ExecuteReader())
+                using (var cmd = new SQLiteCommand("SELECT * FROM Products WHERE Id=@id", conn))
                 {
-                    while (reader.Read())
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        products.Add(new ProductRecord
+                        if (reader.Read())
                         {
-                            Id = Convert.ToInt32(reader["Id"]),
-                            Name = reader["Name"].ToString() ?? string.Empty,
-                            Barcode = reader["Barcode"].ToString() ?? string.Empty,
-                            Price = Convert.ToDecimal(reader["Price"]),
-                            Cost = Convert.ToDecimal(reader["Cost"]),
-                            Quantity = Convert.ToInt32(reader["Quantity"])
-                        });
+                            return new ProductRecord
+                            {
+                                Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
+                                Name = reader["Name"]?.ToString() ?? string.Empty,
+                                Barcode = reader["Barcode"]?.ToString() ?? string.Empty,
+                                Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0m,
+                                Cost = reader["Cost"] != DBNull.Value ? Convert.ToDecimal(reader["Cost"]) : 0m,
+                                Quantity = reader["Quantity"] != DBNull.Value ? Convert.ToInt32(reader["Quantity"]) : 0
+                            };
+                        }
                     }
                 }
             }
-            return products;
+            return null;
         }
 
-        public static List<string> GetLowStockProducts()
+        public static ProductRecord? GetProductByBarcode(string barcode)
         {
-            var products = new List<string>();
             using (var conn = new SQLiteConnection(connectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT Name FROM Products WHERE Quantity <= MinStockLevel", conn))
-                using (var reader = cmd.ExecuteReader())
+                using (var cmd = new SQLiteCommand("SELECT * FROM Products WHERE Barcode=@barcode", conn))
                 {
-                    while (reader.Read())
+                    cmd.Parameters.AddWithValue("@barcode", barcode);
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        products.Add(reader["Name"].ToString() ?? string.Empty);
+                        if (reader.Read())
+                        {
+                            return new ProductRecord
+                            {
+                                Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
+                                Name = reader["Name"]?.ToString() ?? string.Empty,
+                                Barcode = reader["Barcode"]?.ToString() ?? string.Empty,
+                                Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0m,
+                                Cost = reader["Cost"] != DBNull.Value ? Convert.ToDecimal(reader["Cost"]) : 0m,
+                                Quantity = reader["Quantity"] != DBNull.Value ? Convert.ToInt32(reader["Quantity"]) : 0
+                            };
+                        }
                     }
                 }
             }
-            return products;
+            return null;
         }
 
-        // User Methods
+        public static void AddProduct(string name, string barcode, decimal price, decimal cost, int quantity)
+        {
+            ExecuteNonQuery(
+                @"INSERT INTO Products (Name, Barcode, Price, Cost, Quantity) 
+                VALUES (@name, @barcode, @price, @cost, @quantity)",
+                ("@name", name),
+                ("@barcode", barcode),
+                ("@price", price),
+                ("@cost", cost),
+                ("@quantity", quantity)
+            );
+        }
+
+        public static void UpdateProduct(int id, string name, string barcode, decimal price, decimal cost, int quantity)
+        {
+            ExecuteNonQuery(
+                @"UPDATE Products SET 
+                    Name=@name, 
+                    Barcode=@barcode, 
+                    Price=@price, 
+                    Cost=@cost, 
+                    Quantity=@quantity 
+                WHERE Id=@id",
+                ("@name", name),
+                ("@barcode", barcode),
+                ("@price", price),
+                ("@cost", cost),
+                ("@quantity", quantity),
+                ("@id", id)
+            );
+        }
+
+        public static void DeleteProduct(int id)
+        {
+            ExecuteNonQuery(
+                "DELETE FROM Products WHERE Id=@id",
+                ("@id", id)
+            );
+        }
+
         public static DataTable GetCashiers()
         {
-            return GetDataTable("SELECT * FROM Users WHERE Role='cashier'");
+            return GetDataTable(@"SELECT 
+                Id, 
+                Username, 
+                WageType, 
+                WageAmount,
+                LastLogin,
+                TotalSales
+                FROM Users 
+                WHERE Role='Cashier' AND IsActive=1
+                ORDER BY Username");
         }
 
         public static UserRecord? GetUser(string username)
@@ -267,12 +386,12 @@ namespace Smart_Shop
                         {
                             return new UserRecord
                             {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Username = reader["Username"].ToString() ?? string.Empty,
-                                Password = reader["Password"].ToString() ?? string.Empty,
-                                Role = reader["Role"].ToString() ?? string.Empty,
-                                WageType = reader["WageType"].ToString() ?? string.Empty,
-                                WageAmount = Convert.ToDecimal(reader["WageAmount"])
+                                Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
+                                Username = reader["Username"]?.ToString() ?? string.Empty,
+                                Password = reader["Password"]?.ToString() ?? string.Empty,
+                                Role = reader["Role"]?.ToString() ?? string.Empty,
+                                WageType = reader["WageType"]?.ToString() ?? string.Empty,
+                                WageAmount = reader["WageAmount"] != DBNull.Value ? Convert.ToDecimal(reader["WageAmount"]) : 0m
                             };
                         }
                     }
@@ -281,27 +400,14 @@ namespace Smart_Shop
             return null;
         }
 
-        public static bool ValidateUser(string username, string password)
-        {
-            using (var conn = new SQLiteConnection(connectionString))
-            {
-                conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT COUNT(*) FROM Users WHERE Username=@username AND Password=@password", conn))
-                {
-                    cmd.Parameters.AddWithValue("@username", username);
-                    cmd.Parameters.AddWithValue("@password", password);
-                    return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
-                }
-            }
-        }
-
         public static void CreateUser(string username, string password, string role, string wageType, decimal wageAmount)
         {
+            string hashedPassword = HashPassword(password);
             ExecuteNonQuery(
-                @"INSERT INTO Users (Username, Password, Role, WageType, WageAmount) 
-                VALUES (@username, @password, @role, @wageType, @wageAmount)",
+                @"INSERT INTO Users (Username, Password, Role, WageType, WageAmount, IsActive) 
+                VALUES (@username, @password, @role, @wageType, @wageAmount, 1)",
                 ("@username", username),
-                ("@password", password),
+                ("@password", hashedPassword),
                 ("@role", role),
                 ("@wageType", wageType),
                 ("@wageAmount", wageAmount)
@@ -310,10 +416,14 @@ namespace Smart_Shop
 
         public static void UpdateUser(string username, string password, string wageType, decimal wageAmount)
         {
+            string hashedPassword = HashPassword(password);
             ExecuteNonQuery(
-                @"UPDATE Users SET Password=@password, WageType=@wageType, WageAmount=@wageAmount 
+                @"UPDATE Users SET 
+                    Password=@password, 
+                    WageType=@wageType, 
+                    WageAmount=@wageAmount 
                 WHERE Username=@username",
-                ("@password", password),
+                ("@password", hashedPassword),
                 ("@wageType", wageType),
                 ("@wageAmount", wageAmount),
                 ("@username", username)
@@ -328,10 +438,9 @@ namespace Smart_Shop
             );
         }
 
-        // Expense Methods
         public static DataTable GetExpenses()
         {
-            return GetDataTable("SELECT * FROM Expenses");
+            return GetDataTable("SELECT * FROM Expenses ORDER BY ExpenseDate DESC");
         }
 
         public static ExpenseRecord? GetExpense(int id)
@@ -348,11 +457,11 @@ namespace Smart_Shop
                         {
                             return new ExpenseRecord
                             {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Description = reader["Description"].ToString() ?? string.Empty,
-                                Amount = Convert.ToDecimal(reader["Amount"]),
-                                Category = reader["Category"].ToString() ?? string.Empty,
-                                Notes = reader["Notes"].ToString() ?? string.Empty
+                                Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
+                                Description = reader["Description"]?.ToString() ?? string.Empty,
+                                Amount = reader["Amount"] != DBNull.Value ? Convert.ToDecimal(reader["Amount"]) : 0m,
+                                Category = reader["Category"]?.ToString() ?? string.Empty,
+                                Notes = reader["Notes"]?.ToString() ?? string.Empty
                             };
                         }
                     }
@@ -376,8 +485,12 @@ namespace Smart_Shop
         public static void UpdateExpense(int id, string description, decimal amount, string category, string notes)
         {
             ExecuteNonQuery(
-                @"UPDATE Expenses SET Description=@desc, Amount=@amount, 
-                Category=@category, Notes=@notes WHERE Id=@id",
+                @"UPDATE Expenses SET 
+                    Description=@desc, 
+                    Amount=@amount, 
+                    Category=@category, 
+                    Notes=@notes 
+                WHERE Id=@id",
                 ("@desc", description),
                 ("@amount", amount),
                 ("@category", category),
@@ -394,13 +507,14 @@ namespace Smart_Shop
             );
         }
 
-        // Sales and Debt Methods
         public static void RecordSale(int productId, int quantity, decimal price, string paymentMethod, string cashierUsername)
         {
             ExecuteNonQuery(
                 @"INSERT INTO Sales (ProductId, Quantity, UnitPrice, TotalPrice, PaymentMethod, CashierId)
                 VALUES (@productId, @quantity, @price, @total, @method, 
-                        (SELECT Id FROM Users WHERE Username=@username))",
+                        (SELECT Id FROM Users WHERE Username=@username));
+                
+                UPDATE Products SET Quantity = Quantity - @quantity WHERE Id=@productId",
                 ("@productId", productId),
                 ("@quantity", quantity),
                 ("@price", price),
@@ -412,7 +526,12 @@ namespace Smart_Shop
 
         public static DataTable GetDebts()
         {
-            return GetDataTable("SELECT * FROM Debts");
+            return GetDataTable(@"SELECT d.Id, d.CustomerName, d.CustomerPhone, 
+                               d.Amount, d.PaidAmount, d.Amount - d.PaidAmount AS Remaining,
+                               d.Status, u.Username AS Cashier, d.CreatedDate
+                               FROM Debts d
+                               JOIN Users u ON d.CashierId = u.Id
+                               ORDER BY d.CreatedDate DESC");
         }
 
         public static void RecordDebt(string customerName, string phone, decimal amount, string cashierUsername)
@@ -428,7 +547,24 @@ namespace Smart_Shop
             );
         }
 
-        // Request Methods
+        public static void RecordDebtPayment(int debtId, decimal amount, string cashierUsername)
+        {
+            ExecuteNonQuery(
+                @"UPDATE Debts SET 
+                    PaidAmount = PaidAmount + @amount,
+                    Status = CASE WHEN (Amount - (PaidAmount + @amount)) <= 0 THEN 'Paid' ELSE 'Partial' END,
+                    LastPaymentDate = CURRENT_TIMESTAMP
+                WHERE Id = @debtId;
+                
+                INSERT INTO DebtPayments (DebtId, Amount, PaymentDate, CashierId)
+                VALUES (@debtId, @amount, CURRENT_TIMESTAMP, 
+                        (SELECT Id FROM Users WHERE Username=@username))",
+                ("@amount", amount),
+                ("@debtId", debtId),
+                ("@username", cashierUsername)
+            );
+        }
+
         public static int GetPendingRequestsCount()
         {
             using (var conn = new SQLiteConnection(connectionString))
@@ -436,9 +572,34 @@ namespace Smart_Shop
                 conn.Open();
                 using (var cmd = new SQLiteCommand("SELECT COUNT(*) FROM Requests WHERE Status='Pending'", conn))
                 {
-                    return Convert.ToInt32(cmd.ExecuteScalar());
+                    var result = cmd.ExecuteScalar();
+                    return result != null ? Convert.ToInt32(result) : 0;
                 }
             }
+        }
+
+        public static List<string> GetLowStockProducts()
+        {
+            var lowStockItems = new List<string>();
+            using (var conn = new SQLiteConnection(connectionString))
+            {
+                conn.Open();
+                using (var cmd = new SQLiteCommand(
+                    "SELECT Name FROM Products WHERE Quantity <= MinStockLevel", conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader["Name"] != DBNull.Value)
+                            {
+                                lowStockItems.Add(reader["Name"].ToString() ?? string.Empty);
+                            }
+                        }
+                    }
+                }
+            }
+            return lowStockItems;
         }
 
         public static void SubmitRequest(string type, string content, string username)
@@ -453,7 +614,6 @@ namespace Smart_Shop
             );
         }
 
-        // Cashier Notes Methods
         public static DataTable GetCashierNotes()
         {
             return GetDataTable(@"SELECT u.Username, cn.NoteDate, cn.Notes 
@@ -473,24 +633,21 @@ namespace Smart_Shop
             );
         }
 
-        // Summary and Reporting
         public static DataTable GetSummaryData()
         {
-            string query = @"SELECT 
-                            p.Name AS Product,
-                            p.Quantity AS Stock,
-                            p.Price AS CurrentPrice,
-                            SUM(s.Quantity) AS SoldToday,
-                            SUM(s.TotalPrice) AS RevenueToday
-                        FROM Products p
-                        LEFT JOIN Sales s ON p.Id = s.ProductId 
-                            AND DATE(s.SaleDate) = DATE('now')
-                        GROUP BY p.Id";
-            return GetDataTable(query);
+            return GetDataTable(@"SELECT 
+                                p.Name AS Product,
+                                p.Quantity AS Stock,
+                                p.Price AS CurrentPrice,
+                                COALESCE(SUM(s.Quantity), 0) AS SoldToday,
+                                COALESCE(SUM(s.TotalPrice), 0) AS RevenueToday
+                            FROM Products p
+                            LEFT JOIN Sales s ON p.Id = s.ProductId 
+                                AND DATE(s.SaleDate) = DATE('now')
+                            GROUP BY p.Id");
         }
 
-        // Helper Methods
-        private static DataTable GetDataTable(string query)
+        public static DataTable GetDataTable(string query)
         {
             var dt = new DataTable();
             using (var conn = new SQLiteConnection(connectionString))
@@ -503,25 +660,6 @@ namespace Smart_Shop
                 }
             }
             return dt;
-        }
-
-
-
-        // Add this public method to SQLiteDatabase.cs
-        public static void ExecuteNonQuery(string query, params (string name, object value)[] parameters)
-        {
-            using (var conn = new SQLiteConnection(connectionString))
-            {
-                conn.Open();
-                using (var cmd = new SQLiteCommand(query, conn))
-                {
-                    foreach (var param in parameters)
-                    {
-                        cmd.Parameters.AddWithValue(param.name, param.value);
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
         }
     }
 }

@@ -45,36 +45,47 @@ namespace Smart_Shop
                 return;
             }
 
-            if (productId.HasValue)
+            try
             {
-                // Update existing product
-                SQLiteDatabase.ExecuteNonQuery(
-                    @"UPDATE Products SET Name=@name, Price=@price, Cost=@cost, 
-                     Quantity=@quantity, Barcode=@barcode WHERE Id=@id",
-                    ("@name", txtName.Text),
-                    ("@price", numPrice.Value),
-                    ("@cost", numCost.Value),
-                    ("@quantity", (int)numQuantity.Value),
-                    ("@barcode", txtBarcode.Text),
-                    ("@id", productId.Value)
-                );
-            }
-            else
-            {
-                // Add new product
-                SQLiteDatabase.ExecuteNonQuery(
-                    @"INSERT INTO Products (Name, Price, Cost, Quantity, Barcode) 
-                     VALUES (@name, @price, @cost, @quantity, @barcode)",
-                    ("@name", txtName.Text),
-                    ("@price", numPrice.Value),
-                    ("@cost", numCost.Value),
-                    ("@quantity", (int)numQuantity.Value),
-                    ("@barcode", txtBarcode.Text)
-                );
-            }
+                if (productId.HasValue)
+                {
+                    SQLiteDatabase.ExecuteNonQuery(
+                        @"UPDATE Products SET 
+                            Name=@name, 
+                            Barcode=@barcode, 
+                            Price=@price, 
+                            Cost=@cost, 
+                            Quantity=@quantity 
+                        WHERE Id=@id",
+                        ("@name", txtName.Text),
+                        ("@barcode", txtBarcode.Text),
+                        ("@price", numPrice.Value),
+                        ("@cost", numCost.Value),
+                        ("@quantity", (int)numQuantity.Value),
+                        ("@id", productId.Value)
+                    );
+                }
+                else
+                {
+                    SQLiteDatabase.ExecuteNonQuery(
+                        @"INSERT INTO Products (Name, Barcode, Price, Cost, Quantity) 
+                         VALUES (@name, @barcode, @price, @cost, @quantity)",
+                        ("@name", txtName.Text),
+                        ("@barcode", txtBarcode.Text),
+                        ("@price", numPrice.Value),
+                        ("@cost", numCost.Value),
+                        ("@quantity", (int)numQuantity.Value)
+                    );
+                }
 
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving product: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

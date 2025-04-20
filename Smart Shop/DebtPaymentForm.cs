@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace Smart_Shop
 {
@@ -23,6 +22,14 @@ namespace Smart_Shop
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            if (string.IsNullOrWhiteSpace(txtPhone.Text))
+            {
+                MessageBox.Show("Please enter phone number", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

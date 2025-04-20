@@ -15,7 +15,8 @@ namespace Smart_Shop
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(txtUsername.Text) || string.IsNullOrWhiteSpace(txtPassword.Text))
+                if (string.IsNullOrWhiteSpace(txtUsername.Text) ||
+                    string.IsNullOrWhiteSpace(txtPassword.Text))
                 {
                     MessageBox.Show("Please enter both username and password.", "Input Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -44,7 +45,6 @@ namespace Smart_Shop
                 }
                 else
                 {
-                    // Show cashier notes form
                     var notesForm = new CashierNotesForm();
                     if (notesForm.ShowDialog() == DialogResult.OK)
                     {
